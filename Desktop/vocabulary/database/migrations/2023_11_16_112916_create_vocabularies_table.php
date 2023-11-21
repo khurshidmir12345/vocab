@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('category')->nullable();
             $table->string('vocab_photos')->nullable();
             $table->string('vocab_example')->nullable();
-            $table->foreignId('user_id')->nullable();
             $table->timestamps();
         });
     }
