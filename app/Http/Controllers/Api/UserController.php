@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
@@ -23,7 +24,7 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
-        $user = User::create($request->validated());
+        $user = User::query()->create($request->validated());
 
         return new UserResource($user);
     }
@@ -31,17 +32,18 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $id): UserResource
     {
-        return new UserResource(User::findOrFail($id));
+        return new UserResource(User::query()->findOrFail($id));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(StoreUserRequest $request,User $user)
+    public function update(StoreUserRequest $request, User $user)
     {
         $user->update($request->validated());
+
         return $user;
     }
 

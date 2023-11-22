@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
@@ -24,23 +25,20 @@ class VocabularyController extends Controller
      */
     public function store(StoreVocabularyRequest $request)
     {
-        $request->validated();
-        $imagename = $request->file("vocab_photos")->getClientOriginalName();
-        $request->file("vocab_photos")->storeAs("public",$imagename);
+        $imageName = $request->file("vocab_photos")?->getClientOriginalName();
+        $request->file("vocab_photos")?->storeAs("public", $imageName);
 
-        $vocab = Vocabulary::create([
-            "word_uz"=>$request->word_uz,
-            "word_en"=>$request->word_en,
-            "description"=>$request->description,
-            "spelling"=>$request->spelling,
-            "audio"=>$request->audio,
-            "category"=>$request->category,
-            "vocab_photos"=>$imagename,
-            "vocab_example"=>$request->vocab_example,
-            "user_id"=>$request->user_id,
+        $vocab = Vocabulary::query()->create([
+            "word_uz"       => $request->get('word_uz'),
+            "word_en"       => $request->get('word_en'),
+            "description"   => $request->get('description'),
+            "spelling"      => $request->get('spelling'),
+            "audio"         => $request->get('audio'),
+            "category"      => $request->get('category'),
+            "vocab_photos"  => $imageName,
+            "vocab_example" => $request->get('vocab_example'),
+            "user_id"       => $request->get('user_id'),
         ]);
-
-
 
 
         return new VocabularyResource($vocab);
@@ -49,46 +47,52 @@ class VocabularyController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $id): VocabularyResource
     {
-        return new VocabularyResource(Vocabulary::findOrFail($id));
+        return new VocabularyResource(Vocabulary::query()->findOrFail($id));
     }
 
     /**
      * Update the specified resource in storage.
+     * @throws \Exception
      */
     public function update(StoreVocabularyRequest $request, string $id)
     {
-         $request->validated();
-         $imagename = $request->file("vocab_photos")->getClientOriginalName();
-         $vocab = Vocabulary::find($id);
-         $image = storage_path("app/public/".$vocab->vocab_photos);
-         if (file_exists($image)){
-             unlink($image);
-         }
-          $vocab->update([
-             "word_uz"=>$request->word_uz,
-             "word_en"=>$request->word_en,
-             "description"=>$request->description,
-             "spelling"=>$request->spelling,
-             "audio"=>$request->audio,
-             "category"=>$request->category,
-             "vocab_photos"=>$imagename,
-             "vocab_example"=>$request->vocab_example,
-             "user_id"=>$request->user_id,
-          ]);
+        $imageName = $request->file("vocab_photos")?->getClientOriginalName();
 
-        $request->file("vocab_photos")->storeAs("public",$imagename);
+        /** @var Vocabulary $vocab */
+        $vocab = Vocabulary::query()->find($id);
+        if (is_null($vocab)) {
+            throw new \RuntimeException("Vocabulary not found");
+        }
+        $image = storage_path("app/public/".$vocab->vocab_photos);
+        if (file_exists($image)) {
+            unlink($image);
+        }
 
-         return response()->json($vocab);
+        $vocab->update([
+            "word_uz"       => $request->get('word_uz'),
+            "word_en"       => $request->get('word_en'),
+            "description"   => $request->get('description'),
+            "spelling"      => $request->get('spelling'),
+            "audio"         => $request->get('audio'),
+            "category"      => $request->get('category'),
+            "vocab_photos"  => $imageName,
+            "vocab_example" => $request->get('vocab_example'),
+            "user_id"       => $request->get('user_id'),
+        ]);
+
+        $request->file("vocab_photos")?->storeAs("public", $imageName);
+
+        return response()->json($vocab);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id): \Illuminate\Http\JsonResponse
     {
-        $vocab = Vocabulary::find($id);
+        $vocab = Vocabulary::query()->find($id);
         $vocab->delete();
 
         return response()->json('successfully');

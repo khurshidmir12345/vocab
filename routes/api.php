@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\VocabularyController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +20,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::apiResource('/vocabulary','App\Http\Controllers\Api\VocabularyController');
-Route::apiResource('/users', 'App\Http\Controllers\Api\UserController');
+Route::apiResource('/vocabulary', VocabularyController::class);
+Route::apiResource('/users', UserController::class);
 
