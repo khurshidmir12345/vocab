@@ -17,8 +17,6 @@ class UserResource extends JsonResource
         return [
             "id"           => $this->id,
             "name"         => $this->name,
-            "email"        => $this->email,
-            "password"     => $this->password,
             "created_at"   => $this->created_at,
             "Vocabularies" => VocabularyResource::collection($this->vokabs),
         ];

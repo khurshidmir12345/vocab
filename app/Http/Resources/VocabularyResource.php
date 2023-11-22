@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -25,7 +26,6 @@ class VocabularyResource extends JsonResource
             "vocab_photos"  => $this->vocab_photos,
             "vocab_example" => $this->vocab_example,
             "user_id"       => $this->user_id,
-            "user"          => $this->user,
             "created_at"    => $this->created_at,
         ];
     }
