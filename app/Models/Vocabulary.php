@@ -37,7 +37,7 @@ class Vocabulary extends Model
         "user_id",
     ];
 
-    public function users(): BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }

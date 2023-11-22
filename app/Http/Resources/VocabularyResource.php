@@ -25,6 +25,7 @@ class VocabularyResource extends JsonResource
             "vocab_photos"  => $this->vocab_photos,
             "vocab_example" => $this->vocab_example,
             "user_id"       => $this->user_id,
+            "user"          => $this->user,
             "created_at"    => $this->created_at,
         ];
     }
