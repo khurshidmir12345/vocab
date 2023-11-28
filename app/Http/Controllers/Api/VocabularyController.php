@@ -25,15 +25,18 @@ class VocabularyController extends Controller
      */
     public function store(StoreVocabularyRequest $request)
     {
+        $request->validated();
         $imageName = $request->file("vocab_photos")?->getClientOriginalName();
-        $request->file("vocab_photos")?->storeAs("public", $imageName);
+        $audioName = $request->file("audio")?->getClientOriginalName();
+        $request->file("vocab_photos")?->storeAs("public/images", $imageName);
+        $request->file("audio")?->storeAs("public/audios", $audioName);
 
         $vocab = Vocabulary::query()->create([
             "word_uz"       => $request->get('word_uz'),
             "word_en"       => $request->get('word_en'),
             "description"   => $request->get('description'),
             "spelling"      => $request->get('spelling'),
-            "audio"         => $request->get('audio'),
+            "audio"         => $audioName,
             "category"      => $request->get('category'),
             "vocab_photos"  => $imageName,
             "vocab_example" => $request->get('vocab_example'),
@@ -58,6 +61,8 @@ class VocabularyController extends Controller
      */
     public function update(StoreVocabularyRequest $request, string $id)
     {
+        $request->validated();
+        $audioname = $request->file("audio")?->getClientOriginalName();
         $imageName = $request->file("vocab_photos")?->getClientOriginalName();
 
         /** @var Vocabulary $vocab */
@@ -65,9 +70,13 @@ class VocabularyController extends Controller
         if (is_null($vocab)) {
             throw new \RuntimeException("Vocabulary not found");
         }
-        $image = storage_path("app/public/".$vocab->vocab_photos);
+        $image = storage_path("app/public/images/".$vocab->vocab_photos);
+        $audio = storage_path("app/public/audios/".$vocab->audio);
         if (file_exists($image)) {
             unlink($image);
+        }
+        if (file_exists($audio)) {
+            unlink($audio);
         }
 
         $vocab->update([
@@ -75,14 +84,15 @@ class VocabularyController extends Controller
             "word_en"       => $request->get('word_en'),
             "description"   => $request->get('description'),
             "spelling"      => $request->get('spelling'),
-            "audio"         => $request->get('audio'),
+            "audio"         => $audioname,
             "category"      => $request->get('category'),
             "vocab_photos"  => $imageName,
             "vocab_example" => $request->get('vocab_example'),
             "user_id"       => $request->get('user_id'),
         ]);
 
-        $request->file("vocab_photos")?->storeAs("public", $imageName);
+        $request->file("vocab_photos")?->storeAs("public/images", $imageName);
+        $request->file("audio")?->storeAs("public/audios", $audioname);
 
         return response()->json($vocab);
     }
