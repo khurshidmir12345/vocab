@@ -99,12 +99,27 @@ class VocabularyController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(string $id): \Illuminate\Http\JsonResponse
+    public function destroy(string $id)
     {
         $vocab = Vocabulary::query()->find($id);
         $vocab->delete();
 
         return response()->json('successfully');
+    }
+
+    /**
+     * Search for a name.
+     * @param string $name
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function search($name)
+    {
+            $vocab = Vocabulary::query()
+                ->where('word_en','like','%'.$name.'%')
+                ->orWhere('word_uz','like','%'.$name.'%')
+                ->get();
+            return response()->json($vocab);
     }
 }
