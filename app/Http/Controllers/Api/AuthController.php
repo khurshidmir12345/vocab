@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api;
 
 use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -16,11 +19,13 @@ class AuthController extends Controller
             'password'=>'required|string',
         ]);
 
-        $user = User::create([
+        $user = User::query()->create([
             'name'=> $fields['name'],
             'email'=> $fields['email'],
             'password'=> bcrypt($fields['password'])
         ]);
+
+        Auth::login($user);
 
         $token = $user->createToken('myapptoken')->plainTextToken;
 
@@ -47,7 +52,7 @@ class AuthController extends Controller
                 'message'=>'Email or Password dos not correct'
             ],401);
         }
-
+        Auth::login($user);
         $token = $user->createToken('myapptoken')->plainTextToken;
 
         $response = [
@@ -60,10 +65,13 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        auth()->user()->tokens()->delete();
+        // Revoke the token that was used to authenticate the current request...
+//        Auth::user()->currentAccessToken()->delete();
 
-        return [
-          'message'=>'Logged out'
-        ];
+        $user = $request->user();
+        // Sanctum uchun
+        $user->tokens->each->delete();
+
+        return response()->json(['message' => 'Successfully logged out']);
     }
 }

@@ -3,12 +3,21 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+//use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
+
+/**
+ * @property int    $id
+ * @property string $name
+ * @property string $email
+ *
+ * @property Vocabulary   $vocabulary
+ * @property Role   $role
+ */
 
 class User extends Authenticatable
 {
@@ -20,9 +29,13 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'id',
         'name',
         'email',
         'password',
+        'google_id',
+        'google_token',
+        'google_refresh_token',
     ];
 
     public function roles()

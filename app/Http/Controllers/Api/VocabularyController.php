@@ -8,6 +8,7 @@ use App\Http\Requests\StoreVocabularyRequest;
 use App\Http\Resources\VocabularyResource;
 use App\Models\Vocabulary;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 
 
 class VocabularyController extends Controller
@@ -59,9 +60,13 @@ class VocabularyController extends Controller
      * Update the specified resource in storage.
      * @throws \Exception
      */
-    public function update(StoreVocabularyRequest $request, string $id)
+    public function update(Request $request,string $id)
     {
-        $request->validated();
+       
+        $request->validate([
+             'word_uz'=>'required|string',
+             'word_en'=>'required|string' 
+        ]);
         $audioname = $request->file("audio")?->getClientOriginalName();
         $imageName = $request->file("vocab_photos")?->getClientOriginalName();
 

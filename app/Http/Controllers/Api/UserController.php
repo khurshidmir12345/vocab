@@ -7,7 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
-use Symfony\Component\HttpFoundation\Response as ResponseAlias;
+use Illuminate\Http\Request;
+
 
 class UserController extends Controller
 {
@@ -16,17 +17,34 @@ class UserController extends Controller
      */
     public function index()
     {
-        return UserResource::collection(User::all());
+        return UserResource::collection(User::query()->with(['vokabs'])->get());
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreUserRequest $request)
+    public function store(Request $request)
     {
-        $user = User::query()->create($request->validated());
-
-        return new UserResource($user);
+//        $fields = $request->validate([
+//            'name'=> 'required|string',
+//            'email'=>'required|string|unique:users,email',
+//            'password'=>'required|string',
+//        ]);
+//
+//        $user = User::query()->create([
+//            'name'=> $fields['name'],
+//            'email'=> $fields['email'],
+//            'password'=> bcrypt($fields['password'])
+//        ]);
+//
+//        $token = $user->createToken($fields['name'])->plainTextToken;
+//
+//        $response = [
+//            'user'=>$user,
+//            'token'=>$token,
+//        ];
+//
+//        return response($response,201);
     }
 
     /**
@@ -40,20 +58,29 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(StoreUserRequest $request, User $user)
+    public function update(Request $request, string $id)
     {
-        $user->update($request->validated());
+         $request->validate([
+            'name'=> 'required|string',
+            'email'=>'required|string',
+            'password'=>'required|string',
+        ]);
+        $user = User::query()->find($id);
+        $user->update($request->all());
 
-        return $user;
+        return response($user,201);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
+    public function destroy(string $id)
     {
+        $user = User::query()->find($id);
         $user->delete();
 
-        return response(null, ResponseAlias::HTTP_NO_CONTENT);
+        return [
+            'message'=>'deleted user'
+        ];
     }
 }
